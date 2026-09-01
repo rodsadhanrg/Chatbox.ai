@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — ChatFlow AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">CF</div>
+      <div class="brand-name">ChatFlow AI</div>
+    </div>
+
+    <div class="nav-link active" data-section="overview" onclick="showSection('overview')">📊 Dashboard</div>
+    <div class="nav-link" data-section="live-chat" onclick="showSection('live-chat')">💬 Live Chat</div>
+    <div class="nav-link" data-section="websites" onclick="showSection('websites')">🌐 Websites</div>
+    <div class="nav-link" data-section="widget" onclick="showSection('widget')">🎨 Chatbox Widget</div>
+    <div class="nav-link" data-section="api-keys" onclick="showSection('api-keys')">🔑 API Keys</div>
+    <div class="nav-link" data-section="analytics" onclick="showSection('analytics')">📈 Analytics</div>
+
+    <div class="nav-section-label">Account</div>
+    <div class="nav-link" data-section="subscription" onclick="showSection('subscription')">⭐ Subscription</div>
+    <div class="nav-link" data-section="billing" onclick="showSection('billing')">🧾 Billing</div>
+    <div class="nav-link" data-section="profile" onclick="showSection('profile')">👤 Profile</div>
+    <div class="nav-link" data-section="settings" onclick="showSection('settings')">⚙️ Settings</div>
+    <div class="nav-link" onclick="signOutUser()">🚪 Logout</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1 id="page-title">Dashboard</h1>
+        <div class="sub">Here's what's happening across your connected websites.</div>
+      </div>
+      <div class="user-chip glass" data-user-chip></div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section id="section-overview" class="page-section">
+      <div class="grid grid-4" style="margin-bottom:26px;">
+        <div class="card stat-card"><div class="icon">💬</div><div class="value" id="stat-conversations">0</div><div class="label">Total conversations</div></div>
+        <div class="card stat-card"><div class="icon">🟢</div><div class="value" id="stat-active-visitors">0</div><div class="label">Active visitors</div></div>
+        <div class="card stat-card"><div class="icon">🌐</div><div class="value" id="stat-websites">0</div><div class="label">Connected websites</div></div>
+        <div class="card stat-card"><div class="icon">⭐</div><div class="value" id="stat-plan">Free</div><div class="label">Current plan</div></div>
+      </div>
+      <div class="card" style="margin-bottom:26px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3>Monthly usage</h3>
+          <span id="stat-usage" style="font-size:13px; color:var(--muted);">0 / ∞</span>
+        </div>
+        <div class="progress-bar" id="usage-bar"><div style="width:8%"></div></div>
+      </div>
+      <h3 style="margin-bottom:12px;">Announcements</h3>
+      <div id="customer-notifications"></div>
+    </section>
+
+    <!-- LIVE CHAT -->
+    <section id="section-live-chat" class="page-section hidden">
+      <div class="card empty-state">
+        <div class="glyph">💬</div>
+        Live conversations will appear here as visitors message you on a connected website.
+        <div style="margin-top:16px;"><a class="btn btn-primary btn-sm" href="#" onclick="showSection('websites')">Connect a website</a></div>
+      </div>
+    </section>
+
+    <!-- WEBSITES -->
+    <section id="section-websites" class="page-section hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div class="sub" style="margin:0;">Every site with the ChatFlow widget installed.</div>
+        <button class="btn btn-primary" onclick="document.querySelector('#add-website-modal').classList.remove('hidden')">+ Add website</button>
+      </div>
+      <div id="websites-list"></div>
+    </section>
+
+    <!-- WIDGET CUSTOMIZATION -->
+    <section id="section-widget" class="page-section hidden">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="field">
+            <label class="field-label">Website</label>
+            <select id="customize-website-select" class="input"></select>
+          </div>
+          <form id="customize-form" onsubmit="event.preventDefault();">
+            <div class="field">
+              <label class="field-label">Chatbox name</label>
+              <input class="input" id="cz-name" oninput="updateLivePreview()" placeholder="Support">
+            </div>
+            <div class="field">
+              <label class="field-label">Theme color</label>
+              <div class="chip-row" id="color-swatches">
+                <div class="color-swatch" data-color="#6C5CE7" style="background:#6C5CE7" onclick="pickColor('#6C5CE7')"></div>
+                <div class="color-swatch" data-color="#29D3C1" style="background:#29D3C1" onclick="pickColor('#29D3C1')"></div>
+                <div class="color-swatch" data-color="#F5B54C" style="background:#F5B54C" onclick="pickColor('#F5B54C')"></div>
+                <div class="color-swatch" data-color="#FF6B6B" style="background:#FF6B6B" onclick="pickColor('#FF6B6B')"></div>
+                <input type="color" id="cz-color" value="#6C5CE7" oninput="updateLivePreview()" style="width:32px;height:32px;border:none;background:none;padding:0;">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Welcome message</label>
+              <textarea class="input" id="cz-welcome" rows="2" oninput="updateLivePreview()"></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label">Offline message</label>
+              <textarea class="input" id="cz-offline" rows="2"></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label">Position</label>
+              <div class="chip-row">
+                <label class="badge badge-violet" style="cursor:pointer;"><input type="radio" name="position" value="bottom-right" onchange="updateLivePreview()" style="margin-right:6px;">Bottom right</label>
+                <label class="badge badge-violet" style="cursor:pointer;"><input type="radio" name="position" value="bottom-left" onchange="updateLivePreview()" style="margin-right:6px;">Bottom left</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveCustomization(currentUid)">Save changes</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:14px;">Live preview</h3>
+          <div class="preview-frame">
+            <div class="preview-bubble" id="preview-bubble" style="bottom:20px;">💬</div>
+            <div style="position:absolute; top:16px; left:16px; right:16px;" class="glass card-tight">
+              <div style="font-weight:600; font-size:14px;" id="preview-name">Support</div>
+              <div style="font-size:12.5px; color:var(--muted); margin-top:6px;" id="preview-welcome">Hi there! How can we help you today?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- API KEYS -->
+    <section id="section-api-keys" class="page-section hidden">
+      <div class="card">
+        <h3 style="margin-bottom:10px;">Embed code</h3>
+        <p>Paste this snippet before the closing <code>&lt;/body&gt;</code> tag of any connected website.</p>
+        <select id="apikey-website-select" class="input" style="margin-bottom:14px;" onchange="renderEmbedForSelected()"></select>
+        <div class="embed-code" id="embed-code-block">Select a website above.</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="copyEmbedFromBlock()">Copy code</button>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="section-analytics" class="page-section hidden">
+      <div class="grid grid-3">
+        <div class="card stat-card"><div class="icon">👁️</div><div class="value" id="an-visitors">0</div><div class="label">Visitors (30d)</div></div>
+        <div class="card stat-card"><div class="icon">💬</div><div class="value" id="an-chats">0</div><div class="label">Chats (30d)</div></div>
+        <div class="card stat-card"><div class="icon">⏱️</div><div class="value" id="an-response-time">—</div><div class="label">Avg. response time</div></div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIPTION -->
+    <section id="section-subscription" class="page-section hidden">
+      <div id="customer-plans" class="pricing-row"></div>
+    </section>
+
+    <!-- BILLING -->
+    <section id="section-billing" class="page-section hidden">
+      <div class="card">
+        <h3 style="margin-bottom:16px;">Invoice history</h3>
+        <div id="billing-history"></div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="section-profile" class="page-section hidden">
+      <div class="card" style="max-width:480px;">
+        <form id="profile-form" onsubmit="return false;">
+          <div class="field">
+            <label class="field-label">Name</label>
+            <input class="input" name="profileName" id="profileName">
+          </div>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <input class="input" id="profileEmail" disabled>
+          </div>
+          <button class="btn btn-primary" onclick="document.querySelector('#profile-form').dispatchEvent(new Event('submit'))">Save profile</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="section-settings" class="page-section hidden">
+      <div class="card" style="max-width:480px;">
+        <h3 style="margin-bottom:14px;">Account</h3>
+        <div class="kv-row"><span class="k">Email</span><span id="settings-email">—</span></div>
+        <div class="kv-row"><span class="k">Plan</span><span id="settings-plan">—</span></div>
+        <button class="btn btn-danger" style="margin-top:20px;" onclick="signOutUser()">Log out</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Add website modal -->
+<div class="modal-backdrop hidden" id="add-website-modal">
+  <div class="modal">
+    <h3>Add a website</h3>
+    <form id="add-website-form" onsubmit="return false;">
+      <div class="field"><label class="field-label">Website name</label><input class="input" id="new-site-name" placeholder="My Store"></div>
+      <div class="field"><label class="field-label">Website URL</label><input class="input" id="new-site-url" placeholder="https://mystore.com"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="document.querySelector('#add-website-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitAddWebsite()">Generate API key</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Checkout modal (shared markup with plans.html) -->
+<div class="modal-backdrop hidden" id="checkout-modal">
+  <div class="modal">
+    <h3>Confirm subscription</h3>
+    <div class="kv-row"><span class="k">Plan</span><span id="checkout-plan-name">—</span></div>
+    <div class="kv-row"><span class="k">Price</span><span id="checkout-price">—</span></div>
+    <div class="kv-row hidden" id="checkout-discount-row"><span class="k">Discount</span><span id="checkout-discount">—</span></div>
+    <div class="field" style="margin-top:16px;">
+      <label class="field-label">Coupon code</label>
+      <div style="display:flex; gap:8px;">
+        <input class="input" id="coupon-input" placeholder="WELCOME50">
+        <button class="btn btn-ghost btn-sm" onclick="applyCoupon()">Apply</button>
+      </div>
+    </div>
+    <hr class="rule">
+    <div class="kv-row" style="font-weight:700; font-size:16px;"><span>Total</span><span id="checkout-final">—</span></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeCheckout()">Cancel</button>
+      <button class="btn btn-primary" onclick="startCheckout(currentUid)">Pay now</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+<script>
+let currentUid = null;
+const sectionTitles = {
+  overview: "Dashboard", "live-chat": "Live Chat", websites: "Websites", widget: "Chatbox Widget",
+  "api-keys": "API Keys", analytics: "Analytics", subscription: "Subscription", billing: "Billing",
+  profile: "Profile", settings: "Settings",
+};
+
+function showSection(id) {
+  document.querySelectorAll(".page-section").forEach((s) => s.classList.add("hidden"));
+  document.querySelector("#section-" + id).classList.remove("hidden");
+  document.querySelectorAll(".nav-link").forEach((n) => n.classList.toggle("active", n.dataset.section === id));
+  document.querySelector("#page-title").textContent = sectionTitles[id];
+  document.querySelector(".sidebar").classList.remove("open");
+
+  if (id === "analytics") loadCustomerAnalytics(currentUid);
+  if (id === "subscription") loadPlans("#customer-plans", { buyable: true, highlight: "pro" });
+  if (id === "billing") loadBillingHistory(currentUid);
+  if (id === "api-keys") populateApiKeySelect(currentUid);
+}
+
+function pickColor(hex) {
+  document.querySelector("#cz-color").value = hex;
+  document.querySelectorAll(".color-swatch").forEach((s) => s.classList.toggle("selected", s.dataset.color === hex));
+  updateLivePreview();
+}
+
+async function submitAddWebsite() {
+  const name = document.querySelector("#new-site-name").value.trim();
+  const url = document.querySelector("#new-site-url").value.trim();
+  if (!name || !url) return toast("Enter a name and URL.", "error");
+  await addWebsite(currentUid, name, url);
+  document.querySelector("#add-website-modal").classList.add("hidden");
+  document.querySelector("#new-site-name").value = "";
+  document.querySelector("#new-site-url").value = "";
+}
+
+async function populateApiKeySelect(uid) {
+  const sel = document.querySelector("#apikey-website-select");
+  const snap = await db.ref("websites").orderByChild("ownerUid").equalTo(uid).get();
+  const data = snap.val() || {};
+  const ids = Object.keys(data);
+  if (ids.length === 0) { sel.innerHTML = `<option value="">No websites yet</option>`; document.querySelector("#embed-code-block").textContent = "Add a website first."; return; }
+  sel.innerHTML = ids.map((id) => `<option value="${data[id].apiKey}">${escapeHtml(data[id].name)}</option>`).join("");
+  renderEmbedForSelected();
+}
+function renderEmbedForSelected() {
+  const key = document.querySelector("#apikey-website-select").value;
+  document.querySelector("#embed-code-block").textContent = key
+    ? `<script src="https://cdn.chatflow.ai/widget.js"\n data-key="${key}"><\/script>`
+    : "Select a website above.";
+}
+function copyEmbedFromBlock() {
+  const text = document.querySelector("#embed-code-block").textContent;
+  navigator.clipboard.writeText(text).then(() => toast("Embed code copied."));
+}
+
+(async function init() {
+  const { uid, user, profile } = await requireCustomer();
+  currentUid = uid;
+  loadDashboardStats(uid);
+  loadWebsites(uid);
+  populateWebsiteSelect(uid);
+  loadCustomerNotifications();
+  document.querySelector("#profileName").value = profile.name || "";
+  document.querySelector("#profileEmail").value = profile.email || "";
+  document.querySelector("#settings-email").textContent = profile.email || "—";
+  document.querySelector("#settings-plan").textContent = profile.plan || "free";
+  document.querySelector("#profile-form").addEventListener("submit", (e) => saveCustomerProfile(uid, e));
+})();
+</script>
+</body>
+</html>

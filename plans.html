@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — ChatFlow AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="landing-nav">
+  <a href="index.html" class="brand" style="cursor:pointer;">
+    <div class="brand-mark">CF</div>
+    <div class="brand-name">ChatFlow AI</div>
+  </a>
+  <div class="links">
+    <a href="index.html#features">Features</a>
+    <a href="plans.html">Pricing</a>
+  </div>
+  <a href="login.html" class="btn btn-ghost btn-sm">Log in</a>
+</nav>
+
+<section class="section">
+  <div class="section-head" style="margin:0 auto 40px; text-align:center; max-width:560px;">
+    <h2>Plans that scale with your support volume</h2>
+    <p>Sign in to subscribe — you'll keep your free plan until you choose to upgrade.</p>
+  </div>
+  <div id="public-plans" class="pricing-row"></div>
+</section>
+
+<footer class="landing-footer">© 2026 ChatFlow AI. All rights reserved.</footer>
+
+<!-- Checkout modal -->
+<div class="modal-backdrop hidden" id="checkout-modal">
+  <div class="modal">
+    <h3>Confirm subscription</h3>
+    <div class="kv-row"><span class="k">Plan</span><span id="checkout-plan-name">—</span></div>
+    <div class="kv-row"><span class="k">Price</span><span id="checkout-price">—</span></div>
+    <div class="kv-row hidden" id="checkout-discount-row"><span class="k">Discount</span><span id="checkout-discount">—</span></div>
+    <div class="field" style="margin-top:16px;">
+      <label class="field-label">Coupon code</label>
+      <div style="display:flex; gap:8px;">
+        <input class="input" id="coupon-input" placeholder="WELCOME50">
+        <button class="btn btn-ghost btn-sm" onclick="applyCoupon()">Apply</button>
+      </div>
+    </div>
+    <hr class="rule">
+    <div class="kv-row" style="font-weight:700; font-size:16px;"><span>Total</span><span id="checkout-final">—</span></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeCheckout()">Cancel</button>
+      <button class="btn btn-primary" onclick="handlePlanPageCheckout()">Pay now</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+<script>
+  loadPlans("#public-plans", { buyable: true, highlight: "pro" });
+
+  // On this public page the visitor may not be signed in yet — send
+  // them to log in first, then straight back into the checkout flow.
+  function handlePlanPageCheckout() {
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        sessionStorage.setItem("chatflow_pending_plan", checkoutState.planId);
+        window.location.href = "login.html";
+        return;
+      }
+      startCheckout(user.uid);
+    }, { onlyOnce: true });
+  }
+
+  // Resume a checkout that was interrupted by a login redirect.
+  auth.onAuthStateChanged((user) => {
+    const pending = sessionStorage.getItem("chatflow_pending_plan");
+    if (user && pending) {
+      sessionStorage.removeItem("chatflow_pending_plan");
+      openCheckout(pending);
+    }
+  });
+</script>
+</body>
+</html>

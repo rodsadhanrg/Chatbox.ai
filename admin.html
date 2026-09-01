@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — ChatFlow AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">CF</div>
+      <div class="brand-name">Admin</div>
+    </div>
+
+    <div class="nav-link active" data-section="overview" onclick="showAdminSection('overview')">📊 Dashboard</div>
+    <div class="nav-link" data-section="users" onclick="showAdminSection('users')">👥 Users</div>
+    <div class="nav-link" data-section="plans" onclick="showAdminSection('plans')">⭐ Plans</div>
+    <div class="nav-link" data-section="coupons" onclick="showAdminSection('coupons')">🏷️ Coupons</div>
+    <div class="nav-link" data-section="payments" onclick="showAdminSection('payments')">🧾 Payments</div>
+    <div class="nav-link" data-section="analytics" onclick="showAdminSection('analytics')">📈 Analytics</div>
+    <div class="nav-link" data-section="notifications" onclick="showAdminSection('notifications')">📣 Notifications</div>
+    <div class="nav-link" data-section="settings" onclick="showAdminSection('settings')">⚙️ Settings</div>
+    <div class="nav-link" onclick="signOutUser()">🚪 Logout</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1 id="page-title">Dashboard</h1>
+        <div class="sub">Platform-wide overview and controls.</div>
+      </div>
+      <div class="user-chip glass" data-user-chip></div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section id="admsec-overview" class="page-section">
+      <div class="grid grid-4">
+        <div class="card stat-card"><div class="icon">👥</div><div class="value" id="admin-total-users">0</div><div class="label">Total users</div></div>
+        <div class="card stat-card"><div class="icon">🟢</div><div class="value" id="admin-active-users">0</div><div class="label">Active users</div></div>
+        <div class="card stat-card"><div class="icon">💰</div><div class="value" id="admin-revenue">₹0</div><div class="label">Revenue</div></div>
+        <div class="card stat-card"><div class="icon">⭐</div><div class="value" id="admin-subscriptions">0</div><div class="label">Subscriptions</div></div>
+      </div>
+      <div class="grid grid-4" style="margin-top:18px;">
+        <div class="card stat-card"><div class="icon">💬</div><div class="value" id="admin-total-chats">0</div><div class="label">Total chats</div></div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="admsec-users" class="page-section hidden">
+      <div class="card table-wrap" id="admin-users-table"></div>
+    </section>
+
+    <!-- PLANS -->
+    <section id="admsec-plans" class="page-section hidden">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="openPlanForm()">+ Create plan</button>
+      </div>
+      <div class="grid grid-3" id="admin-plans-grid"></div>
+    </section>
+
+    <!-- COUPONS -->
+    <section id="admsec-coupons" class="page-section hidden">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="openCouponForm()">+ Create coupon</button>
+      </div>
+      <div class="card table-wrap" id="admin-coupons-table"></div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section id="admsec-payments" class="page-section hidden">
+      <div class="card table-wrap" id="admin-payments-table"></div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="admsec-analytics" class="page-section hidden">
+      <div class="grid grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:8px;">Revenue, last 6 months</h3>
+          <div id="chart-revenue"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:8px;">New users, last 6 months</h3>
+          <div id="chart-users"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <h3 style="margin-bottom:10px;">Popular plans</h3>
+        <div id="popular-plans"></div>
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="admsec-notifications" class="page-section hidden">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <h3 style="margin-bottom:14px;">Send an announcement</h3>
+          <form id="notif-form" onsubmit="sendNotification(event)">
+            <div class="field"><label class="field-label">Title</label><input class="input" name="notifTitle" required></div>
+            <div class="field"><label class="field-label">Message</label><textarea class="input" name="notifMessage" rows="3" required></textarea></div>
+            <div class="field">
+              <label class="field-label">Type</label>
+              <select class="input" name="notifType">
+                <option value="announcement">Announcement</option>
+                <option value="offer">Offer</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Send to all customers</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:14px;">Recent announcements</h3>
+          <div id="admin-notifications-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="admsec-settings" class="page-section hidden">
+      <div class="card" style="max-width:480px;">
+        <form id="admin-settings-form" onsubmit="saveAdminSettings(event)">
+          <div class="field"><label class="field-label">Platform name</label><input class="input" name="platformName"></div>
+          <div class="field"><label class="field-label">Support email</label><input class="input" name="supportEmail" placeholder="help@chatflow.ai"></div>
+          <button class="btn btn-primary" type="submit">Save settings</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Change plan modal -->
+<div class="modal-backdrop hidden" id="change-plan-modal">
+  <div class="modal">
+    <h3>Change user's plan</h3>
+    <div class="field">
+      <label class="field-label">Plan</label>
+      <select class="input" id="change-plan-select"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeChangePlan()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitChangePlan()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Plan create/edit modal -->
+<div class="modal-backdrop hidden" id="plan-modal">
+  <div class="modal">
+    <h3 id="plan-form-title">Create plan</h3>
+    <form id="plan-form" onsubmit="submitPlanForm(event)">
+      <div class="field"><label class="field-label">Plan name</label><input class="input" name="planName" required></div>
+      <div class="field"><label class="field-label">Price (₹)</label><input class="input" type="number" min="0" name="planPrice" required></div>
+      <div class="field">
+        <label class="field-label">Duration</label>
+        <select class="input" name="planDuration"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select>
+      </div>
+      <div class="field"><label class="field-label">Website limit (number or "unlimited")</label><input class="input" name="planWebsiteLimit" required></div>
+      <div class="field"><label class="field-label">Chat limit / month (blank = unlimited)</label><input class="input" type="number" min="0" name="planChatLimit"></div>
+      <div class="field"><label class="field-label">Storage limit</label><input class="input" name="planStorageLimit" placeholder="e.g. 5 GB"></div>
+      <div class="field"><label class="field-label">Features (one per line)</label><textarea class="input" name="planFeatures" rows="4" placeholder="Unlimited chats&#10;Remove branding&#10;Analytics"></textarea></div>
+      <div class="field"><label class="field-label"><input type="checkbox" name="planActive" checked style="margin-right:8px;">Active / visible to customers</label></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closePlanForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save plan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Coupon create modal -->
+<div class="modal-backdrop hidden" id="coupon-modal">
+  <div class="modal">
+    <h3>Create coupon</h3>
+    <form id="coupon-form" onsubmit="submitCouponForm(event)">
+      <div class="field"><label class="field-label">Code</label><input class="input" name="couponCode" placeholder="WELCOME50" required></div>
+      <div class="field">
+        <label class="field-label">Discount type</label>
+        <select class="input" name="couponType"><option value="percentage">Percentage %</option><option value="fixed">Fixed amount ₹</option></select>
+      </div>
+      <div class="field"><label class="field-label">Value</label><input class="input" type="number" min="0" name="couponValue" required></div>
+      <div class="field"><label class="field-label">Expiry date</label><input class="input" type="date" name="couponExpiry"></div>
+      <div class="field"><label class="field-label">Maximum uses</label><input class="input" type="number" min="0" name="couponMaxUses" placeholder="Blank = unlimited"></div>
+      <div class="field"><label class="field-label">Minimum purchase (₹)</label><input class="input" type="number" min="0" name="couponMinPurchase" placeholder="0"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeCouponForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create coupon</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+<script>
+const adminTitles = {
+  overview: "Dashboard", users: "Users", plans: "Plans", coupons: "Coupons",
+  payments: "Payments", analytics: "Analytics", notifications: "Notifications", settings: "Settings",
+};
+
+function showAdminSection(id) {
+  document.querySelectorAll(".page-section").forEach((s) => s.classList.add("hidden"));
+  document.querySelector("#admsec-" + id).classList.remove("hidden");
+  document.querySelectorAll(".nav-link").forEach((n) => n.classList.toggle("active", n.dataset.section === id));
+  document.querySelector("#page-title").textContent = adminTitles[id];
+  document.querySelector(".sidebar").classList.remove("open");
+
+  if (id === "overview") loadAdminStats();
+  if (id === "users") loadAdminUsers();
+  if (id === "plans") loadAdminPlans();
+  if (id === "coupons") loadAdminCoupons();
+  if (id === "payments") loadAdminPayments();
+  if (id === "analytics") loadAdminAnalytics();
+  if (id === "notifications") loadAdminNotifications();
+  if (id === "settings") loadAdminSettings();
+}
+
+(async function init() {
+  await requireAdmin();
+  loadAdminStats();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatFlow AI — Live chat support for your website</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="landing-nav">
+  <div class="brand">
+    <div class="brand-mark">CF</div>
+    <div class="brand-name">ChatFlow AI</div>
+  </div>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="plans.html">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <a href="login.html" class="btn btn-ghost btn-sm">Log in</a>
+    <a href="login.html" class="btn btn-primary btn-sm">Start free</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div>
+    <span class="badge badge-violet" style="margin-bottom:18px;">Live chat, built for support teams</span>
+    <h1>Answer every visitor before they leave the tab.</h1>
+    <p class="lede">Drop a single script tag on your site and give visitors a real-time chat widget — with your branding, your team, and AI backup when nobody's around.</p>
+    <div class="hero-actions">
+      <a href="login.html" class="btn btn-primary">Start free — no card needed</a>
+      <a href="plans.html" class="btn btn-ghost">See pricing</a>
+    </div>
+  </div>
+  <div class="mock-widget glass">
+    <div class="mw-head">
+      <div class="brand-mark" style="width:28px;height:28px;background:rgba(255,255,255,.2);">S</div>
+      <div>
+        <div style="font-weight:600; font-size:14px;">Support</div>
+        <div style="font-size:11.5px; opacity:.85;">Typically replies in a few minutes</div>
+      </div>
+    </div>
+    <div class="mw-body">
+      <div class="mw-bubble them">Hi there! How can we help you today?</div>
+      <div class="mw-bubble me">Do you support Shopify stores?</div>
+      <div class="mw-bubble them">Yes — install takes under 2 minutes, no code changes needed.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-head">
+    <h2>Everything a support team actually uses</h2>
+    <p>No bloated feature list — just the pieces that get a visitor talking to a real answer, fast.</p>
+  </div>
+  <div class="feature-row">
+    <div class="card feature-card">
+      <div class="icon">💬</div>
+      <h3>Real-time widget</h3>
+      <p>A lightweight embeddable chatbox that loads in milliseconds and matches your brand colors.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="icon">🌐</div>
+      <h3>Multi-website</h3>
+      <p>Connect as many sites as your plan allows, each with its own API key and settings.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="icon">📊</div>
+      <h3>Analytics built in</h3>
+      <p>Visitor counts, chat volume, and response times — no separate dashboard to check.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="section-head">
+    <h2>Simple, transparent pricing</h2>
+    <p>Start free. Upgrade only when you outgrow it.</p>
+  </div>
+  <div id="landing-plans" class="pricing-row">
+    <div class="card plan-card"><p>Loading plans…</p></div>
+  </div>
+</section>
+
+<footer class="landing-footer">© 2026 ChatFlow AI. All rights reserved.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+<script>
+  loadPlans("#landing-plans", { buyable: false, highlight: "pro" });
+</script>
+</body>
+</html>
